@@ -38,6 +38,8 @@ function CartDAO(database) {
         *
         */
 
+        /* 
+        * COMMENT ORIGIN
         var userCart = {
             userId: userId,
             items: []
@@ -51,6 +53,12 @@ function CartDAO(database) {
         // place within your code to pass the userCart to the
         // callback.
         callback(userCart);
+        */
+        
+        // =========== Tao's implement ===========
+        this.db.collection('cart').findOne({userId: userId}, function(err, userCart){
+            callback(userCart);    
+        });
     }
 
 
