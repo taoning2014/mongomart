@@ -324,6 +324,8 @@ function ItemDAO(database) {
          *
          */
 
+        /* 
+        * COMMENT ORIGIN
         var reviewDoc = {
             name: name,
             comment: comment,
@@ -340,6 +342,19 @@ function ItemDAO(database) {
         // place within your code to pass the updated doc to the
         // callback.
         callback(doc);
+        */
+
+        // =========== Tao's implement ===========
+        var reviewDoc = {
+            name: name,
+            comment: comment,
+            stars: stars,
+            date: Date.now()
+        }
+
+        this.db.collection('item').update({_id:itemId},{$push:{"reviews":reviewDoc}}, function(err, doc){
+            callback(doc);            
+        })
     }
 
 
