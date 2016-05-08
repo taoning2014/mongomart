@@ -214,6 +214,8 @@ function ItemDAO(database) {
          *
          */
 
+        /* 
+        * COMMENT ORIGIN
         var item = this.createDummyItem();
         var items = [];
         for (var i=0; i<5; i++) {
@@ -226,6 +228,15 @@ function ItemDAO(database) {
         // place within your code to pass the items for the selected page
         // of search results to the callback.
         callback(items);
+        */
+
+        // =========== Tao's implement ===========
+        var skipPages = page || 0;
+        var cursor = this.db.collection('item').find({$text: {$search:query}});
+        
+        cursor.sort("_id", 1).skip(skipPages*itemsPerPage).limit(itemsPerPage).toArray(function(err, pageItems) {
+            callback(pageItems);    
+        }); 
     }
 
 
@@ -247,7 +258,10 @@ function ItemDAO(database) {
         * simply do this in the mongo shell.
         */
 
-        callback(numItems);
+        // =========== Tao's implement ===========
+        this.db.collection('item').find({$text: {$search:query}}).count(function(err, numItems){
+            callback(numItems);            
+        });
     }
 
 
