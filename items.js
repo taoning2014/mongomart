@@ -18,6 +18,7 @@
 var MongoClient = require('mongodb').MongoClient,
     assert = require('assert');
 
+var categoriesRecord;
 
 function ItemDAO(database) {
     "use strict";
@@ -52,6 +53,8 @@ function ItemDAO(database) {
         *
         */
 
+        /* 
+        * COMMENT ORIGIN
         var categories = [];
         var category = {
             _id: "All",
@@ -66,6 +69,34 @@ function ItemDAO(database) {
         // place within your code to pass the categories array to the
         // callback.
         callback(categories);
+        */
+
+        // =========== Tao's implement ===========
+        this.db.collection('item').aggregate([
+            {$group: {
+                _id: "$category",
+                num: {$sum: 1}
+            }}
+        ], function(err, categories) {
+            // add "All" filed in category
+            var count = 0;
+            categories.forEach(function(item) {
+                count += item.num;
+            })
+            var category = {
+                _id: "All",
+                num: count
+            };
+            categories.push(category)
+
+            categories.sort(function(cate1, cate2){
+                return cate1._id.localeCompare(cate2._id);
+            })
+            // console.log('got getCategories() work' + JSON.stringify(categories));
+            // record this object for later refer
+            categoriesRecord = categories;
+            callback(categories);
+        })
     }
 
 
@@ -94,6 +125,8 @@ function ItemDAO(database) {
          *
          */
 
+        /* 
+        * COMMENT ORIGIN
         var pageItem = this.createDummyItem();
         var pageItems = [];
         for (var i=0; i<5; i++) {
@@ -106,6 +139,19 @@ function ItemDAO(database) {
         // place within your code to pass the items for the selected page
         // to the callback.
         callback(pageItems);
+        */
+
+        // =========== Tao's implement ===========
+        var cursor;
+        var skipPages = page || 0;
+        if (category === "All") {
+            cursor = this.db.collection('item').find()
+        } else {
+            cursor = this.db.collection('item').find({"category": category});
+        }
+        cursor.sort("_id", 1).skip(skipPages*itemsPerPage).limit(itemsPerPage).toArray(function(err, pageItems) {
+            callback(pageItems);    
+        }); 
     }
 
 
@@ -131,7 +177,13 @@ function ItemDAO(database) {
 
          // TODO Include the following line in the appropriate
          // place within your code to pass the count to the callback.
-        callback(numItems);
+
+        // =========== Tao's implement ===========
+        categoriesRecord.forEach(function(item){
+            if (item._id === category) {
+                callback(item.num);
+            }
+        });
     }
 
 
