@@ -278,6 +278,8 @@ function ItemDAO(database) {
          *
          */
 
+        /* 
+        * COMMENT ORIGIN
         var item = this.createDummyItem();
 
         // TODO-lab3 Replace all code above (in this method).
@@ -286,6 +288,12 @@ function ItemDAO(database) {
         // place within your code to pass the matching item
         // to the callback.
         callback(item);
+        */ 
+        
+        // =========== Tao's implement ===========
+        this.db.collection('item').findOne({_id: itemId}, function(err, item) {
+            callback(item);
+        })
     }
 
 
